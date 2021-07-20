@@ -5,11 +5,11 @@ import Form from 'Components/Form';
 import shortid from 'shortid';
 import ContactList from 'Components/ContactList';
 import Filter from 'Components/Filter';
-import initialContacts from 'Data/contacts.json';
+// import initialContacts from 'Data/contacts.json';
 
 class App extends Component {
   state = {
-    contacts: initialContacts,
+    contacts: [],
     filter: '',
   };
 
@@ -22,11 +22,11 @@ class App extends Component {
     if (isRepeat) {
       alert(`${data.name} is already in Contacts`);
       return;
-    } else {
-      this.setState(oldState => ({
-        contacts: [newContact, ...oldState.contacts],
-      }));
     }
+
+    this.setState(oldState => ({
+      contacts: [newContact, ...oldState.contacts],
+    }));
   };
 
   deleteContact = id => {
@@ -41,6 +41,19 @@ class App extends Component {
       [name]: value,
     });
   };
+
+  componentDidMount() {
+    const parsedContacts = JSON.parse(localStorage.getItem('contacts'));
+    if (parsedContacts) {
+      this.setState({ contacts: parsedContacts });
+    }
+  }
+
+  componentDidUpdate(oldProps, oldState) {
+    if (this.state.contacts !== oldState.contacts) {
+      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+    }
+  }
 
   render() {
     const normalizedFilter = this.state.filter.toLowerCase();
